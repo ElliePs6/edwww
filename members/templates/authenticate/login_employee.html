@@ -1,0 +1,28 @@
+{% extends 'vacayvue/base.html' %}
+
+{% block content %}
+
+ {% if messages %}
+ <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    {% for message in messages %}
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    {% endfor %}
+</div>
+ {% endif %}
+ <div class="shadow p-4 mb-5 bg-body rounded">
+    <h1 class="text-center">VacayVue Login Employee.</h1>
+    <!-- company_login.html -->
+<form method="post">
+    {% csrf_token %}
+    {{ form.username.label_tag }}
+    {{ form.username }}
+    {{ form.password.label_tag }}
+    {{ form.password }}
+    {{ form.user_type }}
+    
+</form>
+
+</div>
+
+{% endblock %}

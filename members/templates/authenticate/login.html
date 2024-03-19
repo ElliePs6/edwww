@@ -1,0 +1,38 @@
+{% extends 'vacayvue/base.html' %}
+
+{% block content %}
+
+ {% if messages %}
+ <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    {% for message in messages %}
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    {% endfor %}
+</div>
+ {% endif %}
+ <div class="shadow p-3 mb-5 bg-body rounded">
+    <h1 class="text-center">VacayVue Login User</h1>
+    <br>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+     <form action="" method="POST" class="form-container">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_user_type" class="form-label">User Type</label>
+            {{ form.user_type }}
+        </div>
+        <div class="form-group">
+            <label for="id_username" class="form-label">Username</label>
+            {{ form.username }}
+        </div>
+        <div class="form-group">
+            <label for="id_password" class="form-label">Password</label>
+            {{ form.password }}
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+</div>
+</div>
+</div>
+
+{% endblock %}

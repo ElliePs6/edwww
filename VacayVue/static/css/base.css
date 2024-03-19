@@ -1,0 +1,37 @@
+/* Reset default margin and padding */
+html, body, header, footer, div, p, h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    padding: 0;
+}
+
+/* Set default font and background color */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #d0d3ee;
+}
+
+/* Container styles */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header styles */
+header {
+    background-color: #343a40;
+    color: #ffffff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+/* Footer styles */
+footer {
+    background-color: #3c479b;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+    margin-top: 40px; /* Add margin to create space between the calendar and footer */
+    position: relative; /* Ensure footer stays at the bottom of the page */
+    z-index: 2; /* Ensure footer appears above the calendar */
+}
