@@ -1,42 +1,45 @@
 from django.db import models
-from django.contrib.auth.models import User
-from django.contrib.auth.models import AbstractUser
+from django.conf import settings
+from django.db import models
+from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
+
 
 class CustomUser(AbstractUser):
     USER_TYPE_CHOICES = (
         ('employee', 'Employee'),
         ('company', 'Company'),
+        ('admin', 'Admin'),
     )
+    permissions = models.CharField(max_length=255, null=True, blank=True)  
+    email = models.EmailField(unique=True)
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES)
+    role = models.CharField(max_length=100, null=True)  
+    is_staff = models.BooleanField(default=False)  
+    is_admin = models.BooleanField(default=False)
+    company = models.ForeignKey('Companies', on_delete=models.CASCADE, related_name='employee_profile', null=True, blank=True)
 
-    def __str__(self):
-        return self.username
+class Admins(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
 
 class Companies(models.Model):
-    CompanyID = models.AutoField(primary_key=True)
-  #  manager=models.ForeignKey(User,blank=True,null=True,on_delete=models.SET_NULL)
-    Email = models.EmailField()
-    Companyname = models.CharField(max_length=255)
+    companyID = models.AutoField(primary_key=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='company_profile', default=None)
+    companyname = models.CharField(max_length=255, null=True)
+    hrname = models.CharField(max_length=255, null=True)
 
-    #Εμφανιζει το ονομα στον admin και μπορουμε να δουμε ολα τα σχετικα
     def __str__(self):
-        return self.Companyname
-    
-    
-#Καθε υποληλος θα ανηκει σε μια εταιρια
+        return self.companyname
+
+
 class Employees(models.Model):
-    EmployID = models.AutoField(primary_key=True)
-    Username = models.CharField(max_length=255, unique=True)
-    Firstname = models.CharField(max_length=255)
-    Lastname= models.CharField(max_length=25, blank=True)#Του λεμε οτι δεν ειναι αναγκαστικο να το συμπληρωσεις
-    Password = models.CharField(max_length=255)
-    Role = models.CharField(max_length=50)
-    Email = models.EmailField(unique=True)
-   # Department = models.CharField(max_length=255)
-    CompanyID = models.ForeignKey(Companies,blank=True,null=True, on_delete=models.CASCADE)
+    employeeID = models.AutoField(primary_key=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='employee_profile', default=None, unique=True)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='employee_profiles', null=True)
+    join_date = models.DateTimeField(null=True, blank=True)
+    username = models.CharField(max_length=225, null=True)
     
     def __str__(self):
-        return self.Username
+        return self.user.email
 
 #request ειναι 1:1 σχεση .Μια ετηση για καθε υπαλλοιλο
 class Requests(models.Model):
@@ -51,9 +54,9 @@ class Requests(models.Model):
     ]
 
     request_id = models.AutoField(primary_key=True)
-    EmployID = models.ForeignKey(Employees, blank=True, null=True, on_delete=models.CASCADE)
-    StartDate = models.DateField()
-    EndDate = models.DateField()
+    EmployID = models.ForeignKey(Employees,related_name='requests', blank=True, null=True, on_delete=models.CASCADE)
+    StartDate = models.DateTimeField(null=True, blank=True)
+    EndDate = models.DateTimeField(null=True, blank=True)
     Type = models.CharField(max_length=50)
     Status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=PENDING)
     Comments = models.TextField(blank=True)

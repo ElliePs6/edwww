@@ -1,0 +1,6 @@
+/* Custom CSS for scrollable table */
+.table-responsive {
+    max-height: 400px; /* Adjust max-height as needed */
+    overflow-y: auto;
+}
+

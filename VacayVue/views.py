@@ -4,7 +4,11 @@ from .forms import RequestForm
 from django.http import JsonResponse
 from datetime import datetime
 
+def employee_navbar(request):
+    return render(request, 'vacayvue/employee_navbar.html')
 
+def navbar_company(request):
+    return render(request, 'vacayvue/navbar_company.html')
 
 def calendar(request):  
     all_events = Events.objects.all()
@@ -56,9 +60,9 @@ def remove(request):
     return JsonResponse(data)
  
 def list_employees(request):
-    all_requests=Employees.objects.all()
+    employees=Employees.objects.all()
     return render(request, 'vacayvue/list-employees.html',
-        { 'all_requests':all_requests})
+        { 'employees':employees})
 
 def add_request(request):
     submitted = False

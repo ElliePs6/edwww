@@ -7,31 +7,40 @@ html, body, header, footer, div, p, h1, h2, h3, h4, h5, h6 {
 /* Set default font and background color */
 body {
     font-family: Arial, sans-serif;
-    background-color: #d0d3ee;
+    background-color: white;
+    display: flex;
+   
+    flex-direction: column;
+    min-height: 100vh; /* Ensure the body takes up the full height of the viewport */
 }
 
 /* Container styles */
 .container {
+    flex: 1; /* Take up remaining vertical space */
+    align-items: center;
+    justify-content: center;
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    border: 5px solid #0000;
+    
 }
 
 /* Header styles */
 header {
-    background-color: #343a40;
+    background-color: #d16951;
     color: #ffffff;
-    padding: 10px 0;
+    padding: 5px 0;
     text-align: center;
 }
 
 /* Footer styles */
 footer {
-    background-color: #3c479b;
+    background-color: #3d3a50;
     color: #fff;
+    height: 70px; /* Set the height of the footer */
     padding: 10px 0;
     text-align: center;
-    margin-top: 40px; /* Add margin to create space between the calendar and footer */
-    position: relative; /* Ensure footer stays at the bottom of the page */
-    z-index: 2; /* Ensure footer appears above the calendar */
+    position: relative; /* Change position to relative */
+    z-index: 2; /* Ensure the footer appears above the calendar */
 }
