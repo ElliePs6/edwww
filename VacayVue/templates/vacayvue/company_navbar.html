@@ -1,21 +1,21 @@
 <!-- Vertical Navbar -->
 <div class="nav flex-column" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-    <div class="container-fluid">
-      <!-- Dashboard -->
-      <a class="nav-link active" href="{% url 'calendar' %}">Dashboard</a>
-      
-      <!-- Add Request -->
-      <a class="nav-link" href="{% url 'add-request' %}">Προσθήκη Αιτήσεων</a>
-      <!-- View Request -->
-      <a class="nav-link" href="{% url 'list-requests' %}">Προβολή Αιτήσεων</a>
-      <!-- Add Employee -->
-      <a class="nav-link" href="{% url 'register_employee' %}">Προσθήκη Υπαλλήλου</a>
+  <div class="container-fluid">
+    {% for company in companies %}
+      <a class="nav-link {% if company.id == current_company_id %}active{% endif %}" href="{% url 'company_home' company.id %}">Dashboard</a>
+    {% endfor %}
+    <!-- Add Request -->
+    <a class="nav-link" href="{% url 'add-request' %}">Προσθήκη Αιτήσεων</a>
+    <!-- View Request -->
+    <a class="nav-link" href="{% url 'list-requests' %}">Προβολή Αιτήσεων</a>
+    <!-- Add Employee -->
+    <a class="nav-link" href="{% url 'register_employee' company.id %}">Προσθήκη Υπαλλήλου (Company ID: {{ company.id }})</a>
+    <!-- View Employee-->
+    <a class="nav-link" href="{% url 'list-employees' company.id %}">Προβολή Υπαλλήλων</a>
 
-      <!-- View Employee-->
-      <a class="nav-link" href="{% url 'list-employees' %}">Προβολή Υπαλλήλων</a>    
-      
-      
-    
-    </div>
+    <!-- Debugging: Print user and user type -->
+    <p>User: {{ request.user }}</p>
+    <p>User type: {{ request.user.user_type }}</p>
+    <p>Company ID from session: {{ request.session.company_id }}</p>
   </div>
-  
+</div>

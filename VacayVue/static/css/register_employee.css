@@ -1,4 +1,9 @@
-/* Styles for form container */
+.text-center {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #C33A1A;
+}
+
 .custom-form-container {
   padding: 30px;
   border: 1px solid #ccc;

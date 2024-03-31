@@ -8,6 +8,7 @@ main {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
     max-width: 800px;
+
 }
 
 /* Hero section styles */
@@ -61,14 +62,14 @@ main {
     padding: 10px 20px;
     margin-right: 10px;
     text-decoration: none;
-    color: white;
-    background-color: #3d3a50 ;
+    color: #FFEBB0;
+    background-color: #F84322 ;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
 .button:hover {
-    color: white;
-    background-color: #aab9bd; 
+    color: #FFEBB0;
+    background-color: #ff7551; 
 }

@@ -9,16 +9,20 @@
                 <table id="employee-table" class="table">
                     <thead>
                         <tr>
-                            <th>Username</th>
+                            <th>'Ονομα</th>
+                            <th>Επώνυμο</th>
                             <th>Email</th>
                             <th>Joining Date</th>
                             <!-- Add more columns if needed -->
                         </tr>
                     </thead>
                     <tbody>
-                        {% for employee in employees %}
+                        <h2>Employees added by {{ request.user.email }}:</h2>
+                        {% for employee in employees %}                      
                         <tr>
-                            <td>{{ employee.user.username }}</td>
+                            <td>{{ employee.first_name }}</td>
+                            <td>{{ employee.last_name }}</td>                    
+                            
                             <td>{{ employee.user.email }}</td>
                             <td>{{ employee.user.date_joined }}</td>
                             <!-- Add more columns if needed -->

@@ -1,46 +1,70 @@
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.conf import settings
-from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
 
 
-class CustomUser(AbstractUser):
-    USER_TYPE_CHOICES = (
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, user_type, password=None):
+        if not email:
+            raise ValueError('The Email field must be set')
+        if not user_type:
+            raise ValueError('The user_type field must be set')
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, user_type=user_type)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, user_type, password=None):
+        user = self.create_user(
+            email=email,
+            user_type=user_type,
+            password=password,
+        )
+        user.is_superuser = True
+        user.save(using=self._db)
+        return user
+
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    USER_TYPE_CHOICES = [
         ('employee', 'Employee'),
         ('company', 'Company'),
         ('admin', 'Admin'),
-    )
-    permissions = models.CharField(max_length=255, null=True, blank=True)  
-    email = models.EmailField(unique=True)
+    ]
+
+    email = models.EmailField(verbose_name='email', unique=True)
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES)
-    role = models.CharField(max_length=100, null=True)  
-    is_staff = models.BooleanField(default=False)  
-    is_admin = models.BooleanField(default=False)
-    company = models.ForeignKey('Companies', on_delete=models.CASCADE, related_name='employee_profile', null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
 
-class Admins(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    objects = CustomUserManager()
 
-class Companies(models.Model):
-    companyID = models.AutoField(primary_key=True)
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='company_profile', default=None)
-    companyname = models.CharField(max_length=255, null=True)
-    hrname = models.CharField(max_length=255, null=True)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['user_type']
 
     def __str__(self):
-        return self.companyname
+        return self.email
+
+class Company(models.Model):
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE,related_name='company_profile')
+    name = models.CharField(max_length=255)
+    hr_name = models.CharField(max_length=255)
 
 
-class Employees(models.Model):
-    employeeID = models.AutoField(primary_key=True)
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='employee_profile', default=None, unique=True)
-    company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='employee_profiles', null=True)
+    def __str__(self):
+        return self.name
+
+
+class Employee(models.Model):
+    admin = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='employees')
     join_date = models.DateTimeField(null=True, blank=True)
-    username = models.CharField(max_length=225, null=True)
-    
+    first_name = models.CharField(max_length=30, null=True)
+    last_name = models.CharField(max_length=150, null=True)
+
     def __str__(self):
         return self.user.email
-
 #request ειναι 1:1 σχεση .Μια ετηση για καθε υπαλλοιλο
 class Requests(models.Model):
     APPROVED = 'approved'
@@ -54,7 +78,7 @@ class Requests(models.Model):
     ]
 
     request_id = models.AutoField(primary_key=True)
-    EmployID = models.ForeignKey(Employees,related_name='requests', blank=True, null=True, on_delete=models.CASCADE)
+    EmployID = models.ForeignKey(Employee,related_name='requests', blank=True, null=True, on_delete=models.CASCADE)
     StartDate = models.DateTimeField(null=True, blank=True)
     EndDate = models.DateTimeField(null=True, blank=True)
     Type = models.CharField(max_length=50)
