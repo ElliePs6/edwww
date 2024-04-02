@@ -4,9 +4,7 @@ from django.contrib import messages
 from .forms import  AdminLoginForm,AdminRegistrationForm,RegisterCompanyForm
 #from django.contrib.auth.models import User
 from VacayVue.models import Company
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-
+from django.http import HttpResponse
 
 
 
@@ -15,12 +13,12 @@ def admin_landpage(request):
 
 
 def admin_login(request):
-    form = AdminLoginForm(request.POST)    
     if request.method == 'POST':
         form = AdminLoginForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
+            # Authenticate admin user
             user = authenticate(request, email=email, password=password)
             print(f"Email received in login view: {email}")  # Debugging statement
 
@@ -32,28 +30,35 @@ def admin_login(request):
                     return redirect('admin_home')  # Redirect to admin dashboard
             else:
                 print('Authentication failed')  # Debugging statement
+                # Incorrect credentials
                 messages.error(request, 'Incorrect email or password.')
                 return redirect('admin_login')
-        else:
-            form = AdminLoginForm()  # This line was indented too much in the original code    
+    else:
+        form = AdminLoginForm()
     return render(request, 'authenticate/admin_login.html', {'form': form})
+
 
 def admin_register(request):
     if request.method == 'POST':
         form = AdminRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.user_type = 'admin' 
             user.save()
             return redirect('admin_login')  # Redirect to admin login page
+        
     else:
         form = AdminRegistrationForm()
     return render(request, 'authenticate/admin_register.html', {'form': form})
 
 def admin_home(request):
-    companies = Company.objects.all()
-    return render(request, 'authenticate/admin_home.html', {'companies': companies})
-    
+    if request.user.is_authenticated and request.user.user_type == 'admin':
+        if request.user.user_type == 'admin':
+            companies = Company.objects.all()
+            return render(request, 'authenticate/admin_home.html', {'companies': companies})
+        else:
+            return HttpResponse("You do not have permission to access this page.")
+    else:
+        return HttpResponse("Please log in to access this page.")
 
 
 def logout_admin(request):
@@ -68,18 +73,14 @@ def switch_to_company_login(request):
     else:
         return redirect('admin_home')  # Redirect to admin login page
 
-
-
 def register_company(request):
     if request.method == 'POST':
-        if request.user.is_authenticated:
-            form = RegisterCompanyForm(request.POST)
-            if form.is_valid():
-                form.save()
-                return redirect('admin_home')
-        else:
-            return HttpResponseRedirect(reverse('admin_login'))
+        form = RegisterCompanyForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # No need to authenticate and login here, as it's handled by the form's save method
+            messages.success(request, 'Registration successful!')
+            return redirect('admin_home')  # Assuming 'admin_home' is the correct redirect URL
     else:
         form = RegisterCompanyForm()
     return render(request, 'authenticate/register_company.html', {'form': form})
-

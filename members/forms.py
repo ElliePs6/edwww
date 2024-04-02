@@ -55,11 +55,6 @@ class RegisterCompanyForm(UserCreationForm):
 
         if commit:
             user.save()
-            # Create associated Companies instance
-            Company.objects.create(
-                admin=user,
-                name=self.cleaned_data['name'],
-                hr_name=self.cleaned_data['hr_name']
-            )
+            company_user=Company.objects.create(user=user, name=self.cleaned_data['name'], hr_name=self.cleaned_data['hr_name'])
 
         return user
