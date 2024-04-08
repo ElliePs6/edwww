@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
+import datetime
+
 
 class CustomUser(AbstractUser):
     USER_TYPE_CHOICES = [
@@ -37,40 +39,48 @@ class Employee(models.Model):
 
 
     def __str__(self):
-        return self.user.email
+        return self.user.emai;l
 
-    
+
 
 #request ειναι 1:1 σχεση .Μια ετηση για καθε υπαλλοιλο
-class Requests(models.Model):
-    APPROVED = 'approved'
-    REJECTED = 'rejected'
-    PENDING = 'pending'  # Status when request is submitted
-
-    STATUS_CHOICES = [
-        (APPROVED, 'Approved'),
-        (REJECTED, 'Rejected'),
-        (PENDING, 'Pending'),
+class Request(models.Model):
+    REQUEST_TYPES_CHOICES= [
+        ('κανονική άδεια','Κανονική Άδεια'),
+        ('άδεια εξετάσεων εργαζόμενων σπουδαστών','Αδεια Εξετάσεων Εργαζόμενων Σπουδαστών'),
+        ('άδεια εξετάσεων μεταπτυχιακών φοιτητών','Αδεια Εξετάσεων Μεταπτυχιακών Φοιτητών'),
+        ('αιμοδοτική άδεια','Αιμοδοτική Άδεια'),
+        ('άδεια άνευ αποδοχών','Άδεια Άνευ Αποδοχών'),
+        ('άδεια μητρλοτητας','Άδεια Μητρότητας'),
+        ('άδεια πατρότητας','Άδεια Πατρότητας')
     ]
-
-    employeeID = models.ForeignKey(Employee,blank=True,null=True, on_delete=models.CASCADE)
-    StartDate = models.DateTimeField(null=True, blank=True)
-    EndDate = models.DateTimeField(null=True, blank=True)
-    Type = models.CharField(max_length=50)
-    Status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=PENDING)
-    Comments = models.TextField(blank=True)
-
-    def __str__(self):
-        return self.Type
-
-
-class Events(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255, null=True, blank=True)
+    
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="employee_request")
     start = models.DateTimeField(null=True, blank=True)
     end = models.DateTimeField(null=True, blank=True)
+    type = models.CharField(max_length=50, choices=REQUEST_TYPES_CHOICES)
+    description = models.TextField(blank=True)
+    is_pending = models.BooleanField(default=True)
+    is_approved = models.BooleanField(default=False)
+    is_rejected = models.BooleanField(default=False)
+
+
+    def __str__(self):
+        return self.title
+
+class RequestMember(models.Model):
+
+    request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name="Request")
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="request_members"
+    )
+
     class Meta:
-        db_table = "tblevents"
+        unique_together = ["request", "user"]
+
+    def __str__(self):
+        return str(self.user)
+
 
 
 
@@ -91,7 +101,7 @@ class AuditTrail(models.Model):
         ('reject', 'Reject'),
     ]
     AuditTrailID = models.AutoField(primary_key=True)
-    RequestID = models.ForeignKey(Requests, on_delete=models.CASCADE)
+    RequestID = models.ForeignKey(Request, on_delete=models.CASCADE)
     ActionTimestamp = models.DateTimeField(auto_now_add=True)
     ApproverID = models.ForeignKey(Users, on_delete=models.CASCADE)
     Action = models.CharField(max_length=50)

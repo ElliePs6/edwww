@@ -33,7 +33,6 @@ AUTH_USER_MODEL = 'VacayVue.CustomUser'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'VacayVue.backends.EmailBackend'
 ]
 
 
