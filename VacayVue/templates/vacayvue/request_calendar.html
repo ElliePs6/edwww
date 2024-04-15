@@ -1,21 +1,21 @@
 {% extends 'vacayvue/base.html' %}
 
 {% block title %}Fullcalendar{% endblock title %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-{% block content %}
+{% block calendar %}
 <div class="row">
   <div class="col-md-12">
     <div class="tile row">
+      <!--REQUESTMODAL-->
       <div class="modal fade show" id="requestModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-header bg-primary">
               <h5 class="modal-title text-white" id="exampleModalLongTitle">Προσθήκη Αιτήματος</h5>
-              <button id="modalClose1" type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <button class="close modalClose" data-target="#requestModal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <form id="requestForm" method="post" action="{% url 'add_request' %}">
+            <form method="post" >
               {% csrf_token %}
               <div class="modal-body">
                 <div class="form-group">
@@ -23,238 +23,274 @@
                   {{ form.type }}
                 </div>
                 <div class="form-group">
-                  <label for="message-text" class="col-form-label" id="id_start" >Ημερομηνία Έναρξης:</label>
+                  <label for="message-text" class="col-form-label">Ημερομηνία Έναρξης:</label>
                   {{ form.start }}
                 </div>
                 <div class="form-group">
-                  <label for="message-text" class="col-form-label" id="id_end">End Date:</label>
+                  <label for="message-text" class="col-form-label">Ημερομηνία Λήξης:</label>
                   {{ form.end }}
                 </div>
                 <div class="form-group">
-                  <label for="message-text" class="col-form-label">Ημερομηνία Λήξης:</label>
+                  <label for="message-text" class="col-form-label">Περιγραφή:</label>
                   {{ form.description }}
                 </div>
               </div>
               <div class="modal-footer">
-                <button id="modalClose2" type="button" class="btn btn-danger">Κλείσιμο</button>
-                <button type="submit" class="btn btn-primary">Υποβολή</button>
+                <button class="btn btn-danger modalClose">Κλείσιμο</button>
+                <button type="submit" class="btn btn-primary submitRequestForm">Υποβολή</button>
               </div>
             </form>
           </div>
         </div>
       </div>
+      <!--DETAILMODAL-->
       <div class="modal fade show" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-primary">
-                    <h5 class="modal-title text-white" id="title_event_detail"></h5>
-                    <button id="modalDetailClose" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form method="">
-                    {% csrf_token %}
-                    <div class="modal-body">
-                      <div class="form-group">
-                        <label for="message-text" class="col-form-label">Τύπος:</label>
-                        <p id = "type_request_detail">
-                        </p>
-                    </div>
-                        <div class="form-group">
-                            <label for="message-text" class="col-form-label">Περιγραφή:</label>
-                            <p id = "description_request_detail">
-                            </p>
-                        </div>
-                        <div class="form-group">
-                            <label for="message-text" class="col-form-label">Ημερομηνία Έναρξης:</label>
-                            <p id = "start_request_detail">
-                        </div>
-                        <div class="form-group">
-                            <label for="message-text" class="col-form-label">Ημερομηνία Λήξης:</label>
-                            <p id = "end_request_detail">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button id="delete-request-button" data-request-id="" type="button" class="btn btn-danger">Διαγραφή</button>
-                    </div>
-                </form>
+          <div class="modal-content">
+            <div class="modal-header bg-primary">
+              <h5 class="modal-title text-white" id="title_request_detail">Πληροφορίες Αιτήματος</h5>
+              <button class="close modalClose" data-target="#detailModal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
+            <form method="post">
+              {% csrf_token %}
+              <div class="modal-body">
+                <div class="form-group">
+                  <label for="message-text" class="col-form-label">Τύπος:</label>
+                  <p id="type_request_detail"></p>
+                </div>
+                <div class="form-group">
+                  <label for="message-text" class="col-form-label">Περιγραφή:</label>
+                  <p id="description_request_detail"></p>
+                </div>
+                <div class="form-group">
+                  <label for="message-text" class="col-form-label">Ημερομηνία Έναρξης:</label>
+                  <p id="start_request_detail"></p>
+                </div>
+                <div class="form-group">
+                  <label for="message-text" class="col-form-label">Ημερομηνία Λήξης:</label>
+                  <p id="end_request_detail"></p>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button id="delete-request-button" data-request-id="" class="btn btn-danger">Διαγραφή</button>
+                <!--<button id="edit-request-button" data-edit-request-id="" class="btn btn-primary" >Επεξεργασία</button>-->
+              </div>
+            </div>
+          </form>
         </div>
-    </div>
-    </div>
+      </div>
+      <!--EDITMODAL-->
+    <div class="modal fade show" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header bg-primary">
+              <h5 class="modal-title text-white" id="editModalTitle">Επεξεργασία Αιτήματος</h5>
+              <button class="close modalClose" data-target="#editModal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form method="post">
+              {% csrf_token %}
+              <div class="modal-body">
+                <div class="form-group">
+                  <label for="message-text" class="col-form-label">Τύπος Άδειας:</label>
+                  {{ form.type }}
+                </div>
+                <div class="form-group">
+                  <label for="message-text" class="col-form-label">Ημερομηνία Έναρξης:</label>
+                  {{ form.start }}
+                </div>
+                <div class="form-group">
+                  <label for="message-text" class="col-form-label">Ημερομηνία Λήξης:</label>
+                  {{ form.end }}
+                </div>
+                <div class="form-group">
+                  <label for="message-text" class="col-form-label">Περιγραφή:</label>
+                  {{ form.description }}
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-danger modalClose">Κλείσιμο</button>
+                <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+	</div>
   </div>
 </div>
 
 
 <div class="col-md-4">  
-    <div id='calendar'>
-    </div>
+    <div id="calendar"></div>
 </div> 
-  
-        
-<script>
-  $(document).ready(function () {
 
-    var calendar = $('#calendar').fullCalendar({
-        header: {
+<script>
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            // Check if the cookie contains the name we're looking for
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('calendar')
+    
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+        headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'month,agendaWeek,agendaDay'
+            right: 'dayGridMonth,timeGridWeek,list'
         },
-        events: "/vacayvue/all_requests/",
         selectable: true,
-        selectHelper: true,
         editable: true,
-        dayMaxEvents: true,
-        eventLimit: true,
-        select: function(start, end) {
+        slotDuration: '00:04:00',
+        //weekend:false,
+        // hiddenDays: [0, 6],
+        events: "/vacayvue/all_requests/",
+        select: function(info) {
+            console.log("Selecting dates...");
             $('#requestModal').modal('show');
-            var start = start.format('YYYY-MM-DD');
-            var end = end.format('YYYY-MM-DD');
-            $('#id_start').val(start);
-            $('#id_end').val(end);
-            calendar.fullCalendar('unselect');
+            $('#id_start').val(info.startStr);
+            $('#id_end').val(info.endStr);
+            //  $('#requestModal').modal('hide');
         },
-        eventClick: function(calRequest) {
-          console.log('clicked');
-          var type = calRequest.type;  // Changed "title" to "type"
-          var start = moment(calRequest.start).format('YYYY-MM-DD HH:mm:ss');
-          var end = moment(calRequest.end).format('YYYY-MM-DD HH:mm:ss');
-          var description = calRequest.description || '';
-          var id = calRequest.id;
+        eventClick: function(info) {
+            console.log("Clicked request:", info.event);
+            var event = info.event;
+            var modal = $('#detailModal');
+            modal.find('#type_request_detail').text(event.extendedProps.type);
+            modal.find('#start_request_detail').text(event.startStr);
+            modal.find('#end_request_detail').text(event.endStr);
+            modal.find('#description_request_detail').text(event.extendedProps.description || '');
+            modal.find('#delete-request-button').attr('data-request-id', event.id);
+            modal.modal('show');
+            $('#requestModal').modal('hide');
+        },
+        eventDrop: function (info) {
+          var start = info.event.startStr; 
+          var end = info.event.endStr;
+          var type = info.event.extendedProps.type;
+          var id = info.event.id; 
+          $.ajax({
+              type: "GET",
+              url:"/vacayvue/update/",
+              data: {'type': type, 'start': start, 'end': end, 'id': id},
+              dataType: "json",
+              success: function (data) {
+                  // Refresh the calendar events
+                  calendar.getEventSources().forEach(function (source) {
+                      source.refetch();
+                  });
+                  alert('Η ημερομηνία ανανεώθηκε');
+              },
+              error: function (xhr, status, error) {
+                  console.error('Error:', error);
+                  alert('Υπάρχει κάποιο λάθος με την ενημέρωση της ημερομηνίας');
+              }
+          });
+      }  
       
-          var modalInputEnd = document.getElementById('end_request_detail'); 
       
-          var modal = document.getElementById('detailModal');
-          var modalType = document.getElementById('type_request_detail'); 
-          var modalStart = document.getElementById('start_request_detail'); 
-          var modalEnd = document.getElementById('end_request_detail'); 
-          var modalDescripition = document.getElementById('description_request_detail'); 
-          var deleteButton = document.getElementById("delete-request-button");
-      
-          deleteButton.setAttribute("data-request-id", id);
-          modal.style.display = 'block';
-      
-          modalType.textContent = type;  // Changed "title" to "type"
-          modalStart.textContent = start;
-          modalEnd.textContent = end;
-          modalDescripition.textContent = description;
-      
-          modal.style.display = 'block';
-      },
-      eventResize: function(request, delta, revertFunc) {
-        // Handle event resizing here
-        var requestId = request.id;
-        var newEndDate = request.end.format(); // Get the new end date/time
+      })
+        calendar.render()
 
-        // Example: Update the event's end date in the backend via AJAX
-        $.ajax({
-            url: "/vacayvue/update/", // Replace with your backend endpoint
-            type: 'POST',
-            data: {
-                id: requestId,
-                end: newEndDate,
-                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
-            },
-            success: function(response) {
-                // Handle success
-            },
-            error: function(xhr, status, error) {
-                // Handle error
-                console.error(xhr.responseText);
-                revertFunc(); // Revert event resize
-            }
-        });
+            // Event listeners using event delegation
+    $(document).on('click', '.modalClose', handleCloseModal);
+    $(document).on('submit', 'form', handleSubmitRequestForm);
+
+    function handleCloseModal() {
+        console.log("Closing modal...");
+        $(this).closest('.modal').modal('hide');
     }
-  
-    });
 
-    $('#requestForm').submit(function (request) {
-        // Prevent the default form submission behavior
-       // request.preventDefault();
+    function handleSubmitRequestForm() {
+    console.log("Submitting request form...");
 
-        // Serialize form data
-        var formData = $(this).serialize();
+    var form = $(this).closest('form'); // Get the form element
+    var formData = form.serialize(); // Serialize the form data
 
-        // Send AJAX request to add_request view
-        $.ajax({
-            url: $(this).attr('action'),  // URL to submit the form to (specified in the form's action attribute)
-            type: 'POST',  // HTTP method
-            data: formData,  // Form data to be submitted
-            dataType: 'json',  // Expected data type of the response
-            success: function (response) {
-                // Handle success response
-                if (response.success) {
-                    // Do something (e.g., close the modal)
-                    $('#requestModal').modal('hide');
-                    window.location.reload();
-                } else {
-                    // Handle error response
-                    // Show error messages or handle errors as needed
-                    console.log(response.errors); // Log errors to console for debugging
-                }
-            },
-            error: function (xhr, status, error) {
-              if (xhr.status === 404) {
-                alert('The request does not exist.');  // Show a user-friendly message
-            } else {
-                alert('There was an error processing your request.');  // Show a generic error message
-            }
-            console.error(xhr.responseText);
-          }
-        });
-    });
-   
+    // Debugging: Log the serialized form data
+    console.log("Form data:", formData);
 
-    $('#delete-request-button').click(function(request) {
-      var requestId = this.getAttribute('data-request-id');  // Assuming you have this attribute set properly
-      request.preventDefault()
-  if (confirm("Are you sure you want to remove it?")) {
-      $.ajax({
-          url: "/vacayvue/remove/",
-          type: 'POST',
-          data: {
-              'id': requestId,  // Change 'request_id' to 'id'
-              'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
-          },
-          success: function(response) {
+    $.ajax({
+        url: "/vacayvue/add_request/",
+        type: 'POST',
+        data: formData,
+        headers: {
+        'X-CSRFToken': getCookie('csrftoken') // Fetch the CSRF token from cookies
+    },
+        dataType: 'json',
+        success: function (response) {
+            console.log("Form submission response:", response);
             if (response.success) {
-             
-              $('#detailModal').modal('hide');
-              window.location.reload();
-          } else {
-              alert('Η διαγραφή αντιμετωπίζει πρόβλημα!');
-              console.log(response.errors); 
-          }
-      },
-          error: function(xhr, status, error) {
-              alert('Η διαγραφή αντιμετωπίζει πρόβλημα!');
-              console.error(xhr.responseText);
-          }
-      });
-    }
-  });
-  const closeBtn1 = document.getElementById('modalClose1');
-  const closeBtn3 = document.getElementById('modalDetailClose');
-	closeBtn1.addEventListener('click',()=>{
-      const eventModal = document.getElementById('eventModal')
-      eventModal.style.display = 'none';
+                $('#requestModal').modal('hide');
+                window.location.reload();
+            } else {
+                console.log(response.errors);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error submitting form:", xhr.responseText);
+            if (xhr.status === 404) {
+                alert('The request does not exist.');
+            } else {
+                alert('There was an error processing your request.');
+            }
+        }
     });
-    closeBtn3.addEventListener('click',()=>{
-      const eventModal = document.getElementById('detailModal')
-      eventModal.style.display = 'none';
-    });
+}
+// Attach event listener to form submit event
+$(document).on('submit', 'form', handleSubmitRequestForm);
+
+    document.getElementById('delete-request-button').addEventListener('click', function() {
+        const requestId = this.getAttribute('data-request-id');
+        console.log("Request ID:", requestId);
+        if (confirm('Are you sure you want to delete this event?')) {
+            $.ajax({
+                url: `/vacayvue/delete_request/${requestId}/`,//For dynamic urls
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function(response) {
+                    alert(response.message);
+                    window.location.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert('Error!');
+                }
+            
+            })
+        }
+    })
+
+  
+  
+      
+  }) 
+  
   
 
 
 
-
-});
-    </script>
-   
-    
+</script>
 
 
+  
 
-
-{% endblock %}
+{% endblock calendar %}

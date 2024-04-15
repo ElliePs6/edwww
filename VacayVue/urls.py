@@ -14,10 +14,8 @@ urlpatterns = [
     path('calendar/', views.calendar, name='calendar'),
     path('all_requests/', views.all_requests, name='all_requests'),
     path('add_request/',views.add_request,name='add_request'),
-    
-
-    path('update/', views.update_request, name='update'),
-    path('remove/', views.remove, name='remove'), 
+    path('delete_request/<int:request_id>/', views.delete_request, name='delete_request'),
+    path('update/', views.update, name='update'),
     path('list-requests/',views.list_requests,name="list-requests"),
     path('employee_navbar/', views.employee_navbar,name="employee_navbar"),
    # path('error_template/', views.error_template,name="error_template")

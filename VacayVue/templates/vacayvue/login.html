@@ -7,16 +7,6 @@
       <div class="shadow p-3 mb-4 bg-body rounded">
         <h4 class="text-center">Είσοδος Χρήστη</h4>
         <br>
-        <!-- Display error messages -->
-        {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-        {% endif %}
-        <!-- Login form -->
         <form action="{% url 'login' %}" method="POST" class="form-container">
           {% csrf_token %}
           <div class="form-group">
@@ -31,6 +21,14 @@
             <label for="id_password" class="form-label">Κωδικός</label>
             {{ form.password }}
           </div>
+          {% if request.method == 'POST' %}
+          {% if form.errors %}
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <p>Υπάρχει κάποιο λάθος με τη φόρμα σας</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endif %}
+          {% endif %}
           <button type="submit" class="button">Σύνδεση</button>
         </form>
       </div>
